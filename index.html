@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sheets Projects Test</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #0f0f0f;
+            color: white;
+            text-align: center;
+        }
+
+        header {
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+        }
+
+        p.subtitle {
+            opacity: 0.7;
+            margin-top: 10px;
+        }
+
+        #projects-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 40px;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        .project-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
+            transition: 0.3s ease;
+        }
+
+            .project-card:hover {
+                transform: translateY(-10px);
+            }
+
+            .project-card img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 12px;
+                margin-bottom: 15px;
+            }
+
+            .project-card h3 {
+                margin-bottom: 10px;
+            }
+
+            .project-card p {
+                font-size: 0.9rem;
+                opacity: 0.8;
+            }
+
+            .project-card small {
+                display: block;
+                margin-top: 10px;
+                opacity: 0.6;
+            }
+
+            .project-card a {
+                display: inline-block;
+                margin-top: 15px;
+                padding: 8px 15px;
+                background: #00ffff;
+                color: black;
+                text-decoration: none;
+                border-radius: 8px;
+                font-weight: bold;
+                transition: 0.3s;
+            }
+
+                .project-card a:hover {
+                    background: white;
+                }
+
+        footer {
+            padding: 30px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Projects Test Website</h1>
+        <p class="subtitle">Projects loaded automatically from Google Sheets</p>
+    </header>
+
+    <section>
+        <div id="projects-container"></div>
+    </section>
+
+    <footer>
+        Test Website • Google Sheets Integration
+    </footer>
+
+    <script>
+
+        // 🔥 PASTE YOUR GOOGLE SHEETS CSV LINK HERE
+        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
+
+        fetch(sheetURL)
+            .then(response => response.text())
+            .then(data => {
+                const rows = data.split("\n").slice(1);
+                const container = document.getElementById("projects-container");
+
+                rows.forEach(row => {
+
+                    if (row.trim() === "") return;
+
+                    const columns = row.split(",");
+
+                    const category = columns[0];
+                    const title = columns[1];
+                    const description = columns[2];
+                    const image = columns[3];
+                    const link = columns[4];
+                    const year = columns[5];
+
+                    const card = `
+            <div class="project-card">
+              <img src="${image}" alt="${title}">
+              <h3>${title}</h3>
+              <p>${description}</p>
+              <small>${category.toUpperCase()} • ${year}</small>
+              <a href="${link}" target="_blank">View Project</a>
+            </div>
+          `;
+
+                    container.innerHTML += card;
+
+                });
+
+            })
+            .catch(error => {
+                document.getElementById("projects-container").innerHTML =
+                    "<p style='color:red;'>Error loading projects. Check your Google Sheets link.</p>";
+            });
+
+    </script>
+
+</body>
+</html>
