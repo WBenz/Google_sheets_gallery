@@ -147,69 +147,74 @@
 
     <script>
 
-// 🔥 PASTE YOUR CSV LINK HERE
         const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
 
-fetch(sheetURL)
-  .then(res => res.text())
-  .then(data => {
-    const rows = data.split("\n").slice(1);
-    const container = document.getElementById("projects-container");
+        fetch(sheetURL)
+            .then(res => res.text())
+            .then(data => {
+                const rows = data.split("\n").slice(1);
+                const container = document.getElementById("projects-container");
 
-    rows.forEach(row => {
+                // Create category sections
+                const categories = {
+                    web: createCategorySection("Web Design"),
+                    graphic: createCategorySection("Graphic Design"),
+                    motion: createCategorySection("Motion Design")
+                };
 
-      if (row.trim() === "") return;
+                rows.forEach(row => {
 
-      const columns = row.split(",");
+                    if (row.trim() === "") return;
 
-      const category = columns[0].trim();
-      const title = columns[1];
-      const description = columns[2];
-      const image = columns[3];
-      const link = columns[4];
-      const year = columns[5];
+                    const columns = row.split(",");
 
-      const card = document.createElement("div");
-      card.classList.add("project-card");
-      card.setAttribute("data-category", category);
+                    const category = columns[0].trim();
+                    const title = columns[1];
+                    const description = columns[2];
+                    const image = columns[3];
+                    const link = columns[4];
+                    const year = columns[5];
 
-      card.innerHTML = `
-        <img src="${image}" alt="${title}">
-        <h3>${title}</h3>
-        <p>${description}</p>
-        <small>${category.toUpperCase()} • ${year}</small>
-        <a href="${link}" target="_blank">View Project</a>
+                    const card = document.createElement("div");
+                    card.classList.add("project-card");
+
+                    card.innerHTML = `
+            <img src="${image}" alt="${title}">
+            <h3>${title}</h3>
+            <p>${description}</p>
+            <small>${year}</small>
+            <a href="${link}" target="_blank">View Project</a>
+          `;
+
+                    if (categories[category]) {
+                        categories[category].querySelector(".category-grid").appendChild(card);
+                    }
+
+                });
+
+                // Append sections to main container
+                Object.values(categories).forEach(section => {
+                    container.appendChild(section);
+                });
+
+            });
+
+        function createCategorySection(title) {
+
+            const section = document.createElement("div");
+            section.style.marginBottom = "80px";
+
+            section.innerHTML = `
+        <h2 style="margin-bottom:30px;">${title}</h2>
+        <div class="category-grid"
+             style="display:grid;
+                    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+                    gap:25px;">
+        </div>
       `;
 
-      container.appendChild(card);
-    });
-
-    activateFilters();
-  });
-
-function activateFilters() {
-  const buttons = document.querySelectorAll(".filter-btn");
-  const cards = document.querySelectorAll(".project-card");
-
-  buttons.forEach(button => {
-    button.addEventListener("click", () => {
-
-      document.querySelector(".filter-btn.active").classList.remove("active");
-      button.classList.add("active");
-
-      const filter = button.getAttribute("data-filter");
-
-      cards.forEach(card => {
-        if (filter === "all" || card.dataset.category === filter) {
-          card.classList.remove("hide");
-        } else {
-          card.classList.add("hide");
+            return section;
         }
-      });
-
-    });
-  });
-}
 
     </script>
 
