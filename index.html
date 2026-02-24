@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects Test - Filter Version</title>
+    <title>Projects - Combined Version</title>
 
     <style>
         * {
@@ -33,7 +33,7 @@
         }
 
         .filters {
-            margin: 30px 0;
+            margin: 30px 0 50px;
         }
 
         .filter-btn {
@@ -53,11 +53,30 @@
                 color: black;
             }
 
-        #projects-container {
+        .category-section {
+            margin-bottom: 80px;
+            transition: 0.4s ease;
+        }
+
+            .category-section.hide {
+                opacity: 0;
+                transform: scale(0.98);
+                pointer-events: none;
+                height: 0;
+                overflow: hidden;
+                margin-bottom: 0;
+            }
+
+            .category-section h2 {
+                margin-bottom: 30px;
+                font-size: 1.8rem;
+            }
+
+        .category-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
             gap: 25px;
-            padding: 40px;
+            padding: 0 40px;
             max-width: 1200px;
             margin: auto;
         }
@@ -66,15 +85,11 @@
             background: #1a1a1a;
             padding: 20px;
             border-radius: 15px;
-            transition: 0.4s ease;
-            opacity: 1;
-            transform: scale(1);
+            transition: 0.3s ease;
         }
 
-            .project-card.hide {
-                opacity: 0;
-                transform: scale(0.9);
-                pointer-events: none;
+            .project-card:hover {
+                transform: translateY(-8px);
             }
 
             .project-card img {
@@ -127,7 +142,7 @@
 
     <header>
         <h1>Projects</h1>
-        <p class="subtitle">Loaded dynamically from Google Sheets</p>
+        <p class="subtitle">Dynamic portfolio powered by Google Sheets</p>
     </header>
 
     <div class="filters">
@@ -137,12 +152,10 @@
         <button class="filter-btn" data-filter="motion">Motion</button>
     </div>
 
-    <section>
-        <div id="projects-container"></div>
-    </section>
+    <div id="projects-container"></div>
 
     <footer>
-        Dynamic Projects System Test
+        Combined Category + Filter System
     </footer>
 
     <script>
@@ -152,16 +165,34 @@
         fetch(sheetURL)
             .then(res => res.text())
             .then(data => {
+
                 const rows = data.split("\n").slice(1);
                 const container = document.getElementById("projects-container");
 
-                // Create category sections
-                const categories = {
-                    web: createCategorySection("Web Design"),
-                    graphic: createCategorySection("Graphic Design"),
-                    motion: createCategorySection("Motion Design")
+                const categoryTitles = {
+                    web: "Web Design",
+                    graphic: "Graphic Design",
+                    motion: "Motion Design"
                 };
 
+                const categorySections = {};
+
+                // Create empty sections first
+                Object.keys(categoryTitles).forEach(cat => {
+                    const section = document.createElement("div");
+                    section.classList.add("category-section");
+                    section.setAttribute("data-category", cat);
+
+                    section.innerHTML = `
+            <h2>${categoryTitles[cat]}</h2>
+            <div class="category-grid"></div>
+          `;
+
+                    container.appendChild(section);
+                    categorySections[cat] = section.querySelector(".category-grid");
+                });
+
+                // Add projects
                 rows.forEach(row => {
 
                     if (row.trim() === "") return;
@@ -175,6 +206,8 @@
                     const link = columns[4];
                     const year = columns[5];
 
+                    if (!categorySections[category]) return;
+
                     const card = document.createElement("div");
                     card.classList.add("project-card");
 
@@ -186,34 +219,40 @@
             <a href="${link}" target="_blank">View Project</a>
           `;
 
-                    if (categories[category]) {
-                        categories[category].querySelector(".category-grid").appendChild(card);
-                    }
-
+                    categorySections[category].appendChild(card);
                 });
 
-                // Append sections to main container
-                Object.values(categories).forEach(section => {
-                    container.appendChild(section);
+                activateFilters();
+            });
+
+        function activateFilters() {
+
+            const buttons = document.querySelectorAll(".filter-btn");
+            const sections = document.querySelectorAll(".category-section");
+
+            buttons.forEach(button => {
+
+                button.addEventListener("click", () => {
+
+                    document.querySelector(".filter-btn.active").classList.remove("active");
+                    button.classList.add("active");
+
+                    const filter = button.dataset.filter;
+
+                    sections.forEach(section => {
+
+                        if (filter === "all" || section.dataset.category === filter) {
+                            section.classList.remove("hide");
+                        } else {
+                            section.classList.add("hide");
+                        }
+
+                    });
+
                 });
 
             });
 
-        function createCategorySection(title) {
-
-            const section = document.createElement("div");
-            section.style.marginBottom = "80px";
-
-            section.innerHTML = `
-        <h2 style="margin-bottom:30px;">${title}</h2>
-        <div class="category-grid"
-             style="display:grid;
-                    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-                    gap:25px;">
-        </div>
-      `;
-
-            return section;
         }
 
     </script>
