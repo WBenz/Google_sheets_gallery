@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sheets Projects Test</title>
+    <title>Projects Test - Filter Version</title>
 
     <style>
         * {
@@ -20,17 +20,38 @@
         }
 
         header {
-            padding: 40px 20px;
+            padding: 60px 20px 30px;
         }
 
         h1 {
             font-size: 2.5rem;
         }
 
-        p.subtitle {
-            opacity: 0.7;
+        .subtitle {
+            opacity: 0.6;
             margin-top: 10px;
         }
+
+        .filters {
+            margin: 30px 0;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #00ffff;
+            background: transparent;
+            color: #00ffff;
+            cursor: pointer;
+            border-radius: 30px;
+            transition: 0.3s;
+        }
+
+            .filter-btn.active,
+            .filter-btn:hover {
+                background: #00ffff;
+                color: black;
+            }
 
         #projects-container {
             display: grid;
@@ -45,11 +66,15 @@
             background: #1a1a1a;
             padding: 20px;
             border-radius: 15px;
-            transition: 0.3s ease;
+            transition: 0.4s ease;
+            opacity: 1;
+            transform: scale(1);
         }
 
-            .project-card:hover {
-                transform: translateY(-10px);
+            .project-card.hide {
+                opacity: 0;
+                transform: scale(0.9);
+                pointer-events: none;
             }
 
             .project-card img {
@@ -92,8 +117,8 @@
                 }
 
         footer {
-            padding: 30px;
-            opacity: 0.5;
+            padding: 40px;
+            opacity: 0.4;
         }
     </style>
 </head>
@@ -101,61 +126,90 @@
 <body>
 
     <header>
-        <h1>Projects Test Website</h1>
-        <p class="subtitle">Projects loaded automatically from Google Sheets</p>
+        <h1>Projects</h1>
+        <p class="subtitle">Loaded dynamically from Google Sheets</p>
     </header>
+
+    <div class="filters">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="web">Web</button>
+        <button class="filter-btn" data-filter="graphic">Graphic</button>
+        <button class="filter-btn" data-filter="motion">Motion</button>
+    </div>
 
     <section>
         <div id="projects-container"></div>
     </section>
 
     <footer>
-        Test Website • Google Sheets Integration
+        Dynamic Projects System Test
     </footer>
 
     <script>
 
-        // 🔥 PASTE YOUR GOOGLE SHEETS CSV LINK HERE
+// 🔥 PASTE YOUR CSV LINK HERE
         const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
 
-        fetch(sheetURL)
-            .then(response => response.text())
-            .then(data => {
-                const rows = data.split("\n").slice(1);
-                const container = document.getElementById("projects-container");
+fetch(sheetURL)
+  .then(res => res.text())
+  .then(data => {
+    const rows = data.split("\n").slice(1);
+    const container = document.getElementById("projects-container");
 
-                rows.forEach(row => {
+    rows.forEach(row => {
 
-                    if (row.trim() === "") return;
+      if (row.trim() === "") return;
 
-                    const columns = row.split(",");
+      const columns = row.split(",");
 
-                    const category = columns[0];
-                    const title = columns[1];
-                    const description = columns[2];
-                    const image = columns[3];
-                    const link = columns[4];
-                    const year = columns[5];
+      const category = columns[0].trim();
+      const title = columns[1];
+      const description = columns[2];
+      const image = columns[3];
+      const link = columns[4];
+      const year = columns[5];
 
-                    const card = `
-            <div class="project-card">
-              <img src="${image}" alt="${title}">
-              <h3>${title}</h3>
-              <p>${description}</p>
-              <small>${category.toUpperCase()} • ${year}</small>
-              <a href="${link}" target="_blank">View Project</a>
-            </div>
-          `;
+      const card = document.createElement("div");
+      card.classList.add("project-card");
+      card.setAttribute("data-category", category);
 
-                    container.innerHTML += card;
+      card.innerHTML = `
+        <img src="${image}" alt="${title}">
+        <h3>${title}</h3>
+        <p>${description}</p>
+        <small>${category.toUpperCase()} • ${year}</small>
+        <a href="${link}" target="_blank">View Project</a>
+      `;
 
-                });
+      container.appendChild(card);
+    });
 
-            })
-            .catch(error => {
-                document.getElementById("projects-container").innerHTML =
-                    "<p style='color:red;'>Error loading projects. Check your Google Sheets link.</p>";
-            });
+    activateFilters();
+  });
+
+function activateFilters() {
+  const buttons = document.querySelectorAll(".filter-btn");
+  const cards = document.querySelectorAll(".project-card");
+
+  buttons.forEach(button => {
+    button.addEventListener("click", () => {
+
+      document.querySelector(".filter-btn.active").classList.remove("active");
+      button.classList.add("active");
+
+      const filter = button.getAttribute("data-filter");
+
+      cards.forEach(card => {
+        if (filter === "all" || card.dataset.category === filter) {
+          card.classList.remove("hide");
+        } else {
+          card.classList.add("hide");
+        }
+      });
+
+    });
+  });
+}
 
     </script>
 
