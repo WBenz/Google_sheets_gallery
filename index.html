@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Projects - Combined Version</title>
+    <title>Tunetek Studio - Projects</title>
 
     <style>
         * {
@@ -85,19 +85,27 @@
             background: #1a1a1a;
             padding: 20px;
             border-radius: 15px;
-            transition: 0.3s ease;
+            transition: transform 0.4s ease, opacity 0.4s ease;
+            opacity: 0;
+            transform: translateY(30px);
         }
+
+            .project-card.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
 
             .project-card:hover {
                 transform: translateY(-8px);
             }
 
-            .project-card img {
-                width: 100%;
-                height: 200px;
-                object-fit: cover;
-                border-radius: 12px;
-                margin-bottom: 15px;
+            .project-card img[data-src] {
+                opacity: 0;
+                transition: opacity 0.4s ease;
+            }
+
+            .project-card img.lazy-loaded {
+                opacity: 1;
             }
 
             .project-card h3 {
@@ -115,19 +123,20 @@
                 opacity: 0.6;
             }
 
-            .project-card a {
+            .project-card button {
                 display: inline-block;
                 margin-top: 15px;
                 padding: 8px 15px;
                 background: #00ffff;
                 color: black;
-                text-decoration: none;
+                border: none;
                 border-radius: 8px;
                 font-weight: bold;
+                cursor: pointer;
                 transition: 0.3s;
             }
 
-                .project-card a:hover {
+                .project-card button:hover {
                     background: white;
                 }
 
@@ -155,12 +164,11 @@
     <div id="projects-container"></div>
 
     <footer>
-        Combined Category + Filter System
+        Tunetek Studio Portfolio
     </footer>
 
     <script>
-
-        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
+        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv"; // <-- Replace with your published Google Sheets CSV link
 
         fetch(sheetURL)
             .then(res => res.text())
@@ -177,7 +185,7 @@
 
                 const categorySections = {};
 
-                // Create empty sections first
+                // Create category sections
                 Object.keys(categoryTitles).forEach(cat => {
                     const section = document.createElement("div");
                     section.classList.add("category-section");
@@ -194,11 +202,9 @@
 
                 // Add projects
                 rows.forEach(row => {
-
                     if (row.trim() === "") return;
 
                     const columns = row.split(",");
-
                     const category = columns[0].trim();
                     const title = columns[1];
                     const description = columns[2];
@@ -212,49 +218,118 @@
                     card.classList.add("project-card");
 
                     card.innerHTML = `
-            <img src="${image}" alt="${title}">
+            <img data-src="${image}" alt="${title}">
             <h3>${title}</h3>
             <p>${description}</p>
             <small>${year}</small>
-            <a href="${link}" target="_blank">View Project</a>
+            <button class="view-btn">View Project</button>
           `;
 
                     categorySections[category].appendChild(card);
                 });
 
                 activateFilters();
+                activateAnimations();
+                activateLazyLoad();
+                activateModal();
             });
 
         function activateFilters() {
-
             const buttons = document.querySelectorAll(".filter-btn");
             const sections = document.querySelectorAll(".category-section");
 
             buttons.forEach(button => {
-
                 button.addEventListener("click", () => {
-
                     document.querySelector(".filter-btn.active").classList.remove("active");
                     button.classList.add("active");
 
                     const filter = button.dataset.filter;
 
                     sections.forEach(section => {
-
                         if (filter === "all" || section.dataset.category === filter) {
                             section.classList.remove("hide");
                         } else {
                             section.classList.add("hide");
                         }
-
                     });
-
                 });
-
             });
-
         }
 
+        function activateAnimations() {
+            const cards = document.querySelectorAll(".project-card");
+            const observer = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("show");
+                    }
+                });
+            }, { threshold: 0.2 });
+
+            cards.forEach(card => observer.observe(card));
+        }
+
+        function activateLazyLoad() {
+            const images = document.querySelectorAll("img[data-src]");
+            const imgObserver = new IntersectionObserver(entries => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.dataset.src;
+                        img.classList.add("lazy-loaded");
+                        imgObserver.unobserve(img);
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            images.forEach(img => imgObserver.observe(img));
+        }
+
+        function activateModal() {
+            const modal = document.createElement("div");
+            modal.style.cssText = `
+        position: fixed;
+        top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.9);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        opacity:0;
+        pointer-events:none;
+        transition:0.3s;
+        z-index:9999;
+      `;
+            const modalContent = document.createElement("div");
+            modalContent.style.cssText = "background:#1a1a1a; padding:20px; border-radius:12px; max-width:90%; max-height:90%; overflow:auto; text-align:left;";
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            document.body.addEventListener("click", e => {
+                if (e.target.classList.contains("view-btn")) {
+                    const card = e.target.closest(".project-card");
+                    const title = card.querySelector("h3").innerText;
+                    const desc = card.querySelector("p").innerText;
+                    const imgSrc = card.querySelector("img").src;
+                    const year = card.querySelector("small").innerText;
+
+                    modalContent.innerHTML = `
+            <h2>${title}</h2>
+            <img src="${imgSrc}" style="width:100%; margin:15px 0; border-radius:10px;">
+            <p>${desc}</p>
+            <small>${year}</small>
+            <button id="closeModal" style="margin-top:15px; padding:10px 15px; border:none; background:#00ffff; border-radius:8px; cursor:pointer;">Close</button>
+          `;
+
+                    modal.style.opacity = "1";
+                    modal.style.pointerEvents = "auto";
+
+                    document.getElementById("closeModal").addEventListener("click", () => {
+                        modal.style.opacity = "0";
+                        modal.style.pointerEvents = "none";
+                    });
+                }
+            });
+        }
     </script>
 
 </body>
