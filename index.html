@@ -2,34 +2,126 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Tunetek Projects</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tunetek Studio – Projects</title>
 
     <style>
+        :root {
+            --bg: #070707;
+            --card: #111;
+            --accent: #ffffff;
+            --muted: #888;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
-            background: #0a0a0a;
+            font-family: Arial, Helvetica, sans-serif;
+            background: var(--bg);
             color: white;
             overflow-x: hidden;
         }
 
-        h1 {
-            text-align: center;
-            padding: 60px 0 20px;
-            font-size: 36px;
-            letter-spacing: 2px;
+        .loader {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            z-index: 9999;
         }
 
+            .loader span {
+                width: 40px;
+                height: 40px;
+                border: 3px solid #333;
+                border-top: 3px solid white;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        /* HERO */
+        .hero {
+            height: 80vh;
+            position: relative;
+            display: flex;
+            align-items: center;
+            padding: 80px;
+            background-size: cover;
+            background-position: center;
+        }
+
+            .hero::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3));
+            }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            max-width: 600px;
+            animation: fadeUp 1s ease forwards;
+        }
+
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            color: var(--muted);
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .hero button {
+            padding: 12px 30px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+            .hero button:hover {
+                background: #ddd;
+            }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* FILTERS */
         .filters {
             text-align: center;
-            margin-bottom: 40px;
+            padding: 40px 0 20px;
         }
 
             .filters button {
-                margin: 5px;
+                margin: 8px;
                 padding: 10px 25px;
                 background: transparent;
-                border: 1px solid #333;
+                border: 1px solid #222;
                 color: white;
                 cursor: pointer;
                 transition: 0.3s;
@@ -40,6 +132,7 @@
                     color: black;
                 }
 
+        /* GRID */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
@@ -48,16 +141,19 @@
         }
 
         .card {
-            background: #111;
+            background: var(--card);
             border-radius: 14px;
             overflow: hidden;
             cursor: pointer;
-            transition: 0.4s ease;
+            transition: 0.4s;
             position: relative;
+            opacity: 0;
+            transform: translateY(30px);
         }
 
-            .card:hover {
-                transform: translateY(-10px);
+            .card.visible {
+                opacity: 1;
+                transform: translateY(0);
             }
 
             .card img {
@@ -68,33 +164,51 @@
             }
 
             .card:hover img {
-                transform: scale(1.05);
-                opacity: 0.8;
+                transform: scale(1.08);
+                opacity: 0.7;
             }
 
-        .play-icon {
+        .overlay {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%,-50%);
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 50px;
-            opacity: 0.9;
+            opacity: 0;
+            transition: 0.3s;
+        }
+
+        .card:hover .overlay {
+            opacity: 1;
         }
 
         .card-content {
             padding: 20px;
         }
 
+            .card-content h3 {
+                margin: 0 0 10px;
+            }
+
+            .card-content p {
+                margin: 0;
+                color: var(--muted);
+                font-size: 14px;
+            }
+
+        /* MODAL */
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.95);
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: 0.4s ease;
+            transition: 0.4s;
             padding: 40px;
         }
 
@@ -106,26 +220,13 @@
         .modal-content {
             max-width: 1000px;
             width: 100%;
-            text-align: center;
-            animation: fadeIn 0.4s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                transform: scale(0.95);
-                opacity: 0;
-            }
-
-            to {
-                transform: scale(1);
-                opacity: 1;
-            }
+            animation: fadeUp 0.4s ease;
         }
 
         iframe {
             width: 100%;
             height: 520px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .slider {
@@ -136,6 +237,7 @@
                 width: 100%;
                 max-height: 550px;
                 object-fit: contain;
+                transition: 0.4s;
             }
 
         .arrow {
@@ -146,15 +248,14 @@
             background: rgba(0,0,0,0.6);
             padding: 10px 15px;
             cursor: pointer;
-            user-select: none;
         }
 
             .arrow.left {
-                left: 10px;
+                left: 10px
             }
 
             .arrow.right {
-                right: 10px;
+                right: 10px
             }
 
         .close {
@@ -164,19 +265,38 @@
             font-size: 35px;
             cursor: pointer;
         }
+
+        /* RESPONSIVE */
+        @media(max-width:768px) {
+            .hero {
+                padding: 40px;
+                height: 70vh
+            }
+
+                .hero h1 {
+                    font-size: 32px
+                }
+
+            iframe {
+                height: 300px
+            }
+        }
     </style>
 </head>
 
 <body>
 
-    <h1>Our Projects</h1>
+    <div class="loader" id="loader"><span></span></div>
 
-    <div class="filters">
-        <button onclick="filterProjects('all')">All</button>
-        <button onclick="filterProjects('web')">Web</button>
-        <button onclick="filterProjects('graphic')">Graphic</button>
-        <button onclick="filterProjects('motion')">Motion</button>
-    </div>
+    <section class="hero" id="hero" style="display:none;">
+        <div class="hero-content">
+            <h1 id="heroTitle"></h1>
+            <p id="heroDesc"></p>
+            <button onclick="scrollToProjects()">Explore Projects</button>
+        </div>
+    </section>
+
+    <div class="filters" id="filters"></div>
 
     <div class="grid" id="projects"></div>
 
@@ -187,135 +307,183 @@
 
     <script>
 
-        const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
+        const sheetURL ="https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
 
-        let allProjects = [];
-        let currentImages = [];
-        let currentSlide = 0;
+let allProjects=[];
+let currentImages=[];
+let currentSlide=0;
 
-        fetch(sheetURL)
-            .then(res => res.text())
-            .then(data => {
-                const rows = data.split("\n").slice(1);
-                rows.forEach(row => {
-                    const cols = row.split(",");
-                    if (cols.length >= 8) {
-                        allProjects.push({
-                            category: cols[0].trim(),
-                            title: cols[1].trim(),
-                            description: cols[2].trim(),
-                            images: cols[3].trim(),
-                            video: cols[4].trim()
-                        });
-                    }
-                });
-                displayProjects(allProjects);
-            });
+fetch(sheetURL)
+.then(res=>res.text())
+.then(data=>{
+  const rows=data.split("\n").slice(1);
+  rows.forEach(row=>{
+    const cols=row.split(",");
+    if(cols.length>=8){
+      allProjects.push({
+        category:cols[0].trim(),
+        title:cols[1].trim(),
+        description:cols[2].trim(),
+        images:cols[3].trim(),
+        video:cols[4].trim(),
+        year:cols[6].trim(),
+        featured:cols[7].trim()
+      });
+    }
+  });
+  init();
+});
 
-        function getYouTubeThumbnail(url) {
-            const id = url.split("v=")[1];
-            return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-        }
+function init(){
+  document.getElementById("loader").style.display="none";
+  setupHero();
+  setupFilters();
+  displayProjects(allProjects);
+  revealOnScroll();
+}
 
-        function displayProjects(projects) {
-            const container = document.getElementById("projects");
-            container.innerHTML = "";
+function setupHero(){
+  let featured=allProjects.find(p=>p.featured==="yes");
+  if(!featured) featured=allProjects[0];
+  if(!featured) return;
 
-            projects.forEach(project => {
-                let thumb = "https://via.placeholder.com/800x500";
+  let bg="";
+  if(featured.video && featured.video.includes("youtube")){
+    const id=featured.video.split("v=")[1];
+    bg=`https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+  } else if(featured.images){
+    bg=featured.images.split("|")[0];
+  }
 
-                if (project.video) {
-                    if (project.video.includes("youtube")) {
-                        thumb = getYouTubeThumbnail(project.video);
-                    } else {
-                        thumb = "https://via.placeholder.com/800x500?text=Video+Project";
-                    }
-                }
-                else if (project.images) {
-                    thumb = project.images.split("|")[0];
-                }
+  const hero=document.getElementById("hero");
+  hero.style.backgroundImage=`url(${bg})`;
+  hero.style.display="flex";
+  document.getElementById("heroTitle").innerText=featured.title;
+  document.getElementById("heroDesc").innerText=featured.description;
+}
 
-                const card = document.createElement("div");
-                card.className = "card";
+function setupFilters(){
+  const counts={web:0,graphic:0,motion:0};
+  allProjects.forEach(p=>{
+    if(counts[p.category]!==undefined) counts[p.category]++;
+  });
 
-                let playIcon = project.video ? `<div class="play-icon">▶</div>` : "";
+  const filters=document.getElementById("filters");
+  filters.innerHTML=`
+    <button onclick="filterProjects('all')">All (${allProjects.length})</button>
+    <button onclick="filterProjects('web')">Web (${counts.web})</button>
+    <button onclick="filterProjects('graphic')">Graphic (${counts.graphic})</button>
+    <button onclick="filterProjects('motion')">Motion (${counts.motion})</button>
+  `;
+}
 
-                card.innerHTML = `
-          <img src="${thumb}">
-          ${playIcon}
-          <div class="card-content">
-            <h3>${project.title}</h3>
-            <p>${project.description}</p>
-          </div>
-        `;
+function getYouTubeThumb(url){
+  const id=url.split("v=")[1];
+  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+}
 
-                card.onclick = () => openModal(project);
-                container.appendChild(card);
-            });
-        }
+function displayProjects(projects){
+  const container=document.getElementById("projects");
+  container.innerHTML="";
+  projects.forEach(p=>{
+    let thumb="";
+    if(p.video){
+      thumb=p.video.includes("youtube")?getYouTubeThumb(p.video):"https://via.placeholder.com/800x500?text=Video";
+    } else if(p.images){
+      thumb=p.images.split("|")[0];
+    }
 
-        function filterProjects(category) {
-            if (category === "all") {
-                displayProjects(allProjects);
-            } else {
-                displayProjects(allProjects.filter(p => p.category === category));
-            }
-        }
+    const card=document.createElement("div");
+    card.className="card";
+    card.innerHTML=`
+      <img loading="lazy" src="${thumb}">
+      ${p.video?'<div class="overlay">▶</div>':''}
+      <div class="card-content">
+        <h3>${p.title}</h3>
+        <p>${p.year}</p>
+      </div>
+    `;
+    card.onclick=()=>openModal(p);
+    container.appendChild(card);
+  });
+}
 
-        function openModal(project) {
-            const modal = document.getElementById("modal");
-            const content = document.getElementById("modalContent");
-            content.innerHTML = "";
+function filterProjects(cat){
+  if(cat==="all") displayProjects(allProjects);
+  else displayProjects(allProjects.filter(p=>p.category===cat));
+  revealOnScroll();
+}
 
-            if (project.video) {
-                let embedURL = "";
-                if (project.video.includes("youtube")) {
-                    const id = project.video.split("v=")[1];
-                    embedURL = `https://www.youtube.com/embed/${id}`;
-                }
-                if (project.video.includes("vimeo")) {
-                    const id = project.video.split("vimeo.com/")[1];
-                    embedURL = `https://player.vimeo.com/video/${id}`;
-                }
-                content.innerHTML += `<iframe src="${embedURL}" frameborder="0" allowfullscreen></iframe>`;
-            }
+function openModal(p){
+  const modal=document.getElementById("modal");
+  const content=document.getElementById("modalContent");
+  content.innerHTML="";
+  document.body.style.overflow="hidden";
 
-            if (!project.video && project.images) {
-                currentImages = project.images.split("|");
-                currentSlide = 0;
-                content.innerHTML += `
-          <div class="slider">
-            <span class="arrow left" onclick="prevSlide()">‹</span>
-            <img id="slideImage" src="${currentImages[0]}">
-            <span class="arrow right" onclick="nextSlide()">›</span>
-          </div>
-        `;
-            }
+  if(p.video){
+    let embed="";
+    if(p.video.includes("youtube")){
+      const id=p.video.split("v=")[1];
+      embed=`https://www.youtube.com/embed/${id}`;
+    }
+    if(p.video.includes("vimeo")){
+      const id=p.video.split("vimeo.com/")[1];
+      embed=`https://player.vimeo.com/video/${id}`;
+    }
+    content.innerHTML+=`<iframe src="${embed}" frameborder="0" allowfullscreen></iframe>`;
+  }
 
-            content.innerHTML += `<h2>${project.title}</h2><p>${project.description}</p>`;
+  if(!p.video && p.images){
+    currentImages=p.images.split("|");
+    currentSlide=0;
+    content.innerHTML+=`
+      <div class="slider">
+        <span class="arrow left" onclick="prevSlide()">‹</span>
+        <img id="slideImage" src="${currentImages[0]}">
+        <span class="arrow right" onclick="nextSlide()">›</span>
+      </div>
+    `;
+  }
 
-            modal.classList.add("active");
-        }
+  content.innerHTML+=`<h2>${p.title}</h2><p>${p.description}</p>`;
+  modal.classList.add("active");
+}
 
-        function nextSlide() {
-            currentSlide = (currentSlide + 1) % currentImages.length;
-            document.getElementById("slideImage").src = currentImages[currentSlide];
-        }
+function closeModal(){
+  document.getElementById("modal").classList.remove("active");
+  document.body.style.overflow="auto";
+}
 
-        function prevSlide() {
-            currentSlide = (currentSlide - 1 + currentImages.length) % currentImages.length;
-            document.getElementById("slideImage").src = currentImages[currentSlide];
-        }
+function nextSlide(){
+  currentSlide=(currentSlide+1)%currentImages.length;
+  document.getElementById("slideImage").src=currentImages[currentSlide];
+}
 
-        function closeModal() {
-            document.getElementById("modal").classList.remove("active");
-        }
+function prevSlide(){
+  currentSlide=(currentSlide-1+currentImages.length)%currentImages.length;
+  document.getElementById("slideImage").src=currentImages[currentSlide];
+}
 
-        document.addEventListener("keydown", function (e) {
-            if (e.key === "Escape") closeModal();
-            if (e.key === "ArrowRight" && currentImages.length > 1) nextSlide();
-            if (e.key === "ArrowLeft" && currentImages.length > 1) prevSlide();
-        });
+document.addEventListener("keydown",e=>{
+  if(e.key==="Escape") closeModal();
+  if(e.key==="ArrowRight") nextSlide();
+  if(e.key==="ArrowLeft") prevSlide();
+});
+
+function revealOnScroll(){
+  const cards=document.querySelectorAll(".card");
+  const trigger=window.innerHeight*0.9;
+  cards.forEach(card=>{
+    const top=card.getBoundingClientRect().top;
+    if(top<trigger) card.classList.add("visible");
+  });
+}
+
+window.addEventListener("scroll",revealOnScroll);
+
+function scrollToProjects(){
+  document.getElementById("projects").scrollIntoView({behavior:"smooth"});
+}
 
     </script>
 
