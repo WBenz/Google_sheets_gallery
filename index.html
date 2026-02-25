@@ -2,19 +2,20 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Advanced Projects Test</title>
+    <title>Premium Projects</title>
 
     <style>
         body {
             margin: 0;
             font-family: Arial, sans-serif;
-            background: #0f0f0f;
+            background: #0d0d0d;
             color: white;
         }
 
         h1 {
             text-align: center;
             padding: 40px 0;
+            font-size: 32px;
         }
 
         .filters {
@@ -25,77 +26,106 @@
             .filters button {
                 margin: 5px;
                 padding: 10px 20px;
-                border: none;
-                background: #222;
+                border: 1px solid #333;
+                background: transparent;
                 color: white;
                 cursor: pointer;
                 transition: 0.3s;
             }
 
                 .filters button:hover {
-                    background: #555;
+                    background: white;
+                    color: black;
                 }
 
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 20px;
-            padding: 20px;
+            gap: 25px;
+            padding: 40px;
         }
 
         .card {
-            background: #1a1a1a;
-            border-radius: 10px;
+            background: #141414;
+            border-radius: 12px;
             overflow: hidden;
             cursor: pointer;
-            transition: 0.3s;
+            transition: 0.4s ease;
         }
 
             .card:hover {
-                transform: translateY(-5px);
+                transform: translateY(-8px);
             }
 
             .card img {
                 width: 100%;
-                height: 200px;
+                height: 220px;
                 object-fit: cover;
             }
 
         .card-content {
-            padding: 15px;
+            padding: 20px;
         }
 
         .modal {
-            display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
+            display: none;
             justify-content: center;
             align-items: center;
             flex-direction: column;
-            padding: 20px;
+            padding: 40px;
         }
 
             .modal.active {
                 display: flex;
             }
 
-            .modal iframe {
-                width: 80%;
-                height: 450px;
-                margin-bottom: 20px;
+        .modal-content {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .slider {
+            position: relative;
+        }
+
+            .slider img {
+                width: 100%;
+                max-height: 500px;
+                object-fit: contain;
             }
 
-            .modal img {
-                max-width: 80%;
-                max-height: 400px;
-                margin-bottom: 15px;
+        .arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 30px;
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            cursor: pointer;
+        }
+
+            .arrow.left {
+                left: 10px;
             }
+
+            .arrow.right {
+                right: 10px;
+            }
+
+        iframe {
+            width: 100%;
+            height: 500px;
+            margin-bottom: 20px;
+        }
 
         .close {
             position: absolute;
-            top: 20px;
-            right: 40px;
+            top: 30px;
+            right: 50px;
             font-size: 30px;
             cursor: pointer;
         }
@@ -117,107 +147,136 @@
 
     <div class="modal" id="modal">
         <div class="close" onclick="closeModal()">✖</div>
-        <div id="modalContent"></div>
+        <div class="modal-content" id="modalContent"></div>
     </div>
 
     <script>
 
         const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
 
-let allProjects = [];
+        let allProjects = [];
+        let currentSlide = 0;
+        let currentImages = [];
 
-fetch(sheetURL)
-  .then(res => res.text())
-  .then(data => {
-    const rows = data.split("\n").slice(1);
-    rows.forEach(row => {
-      const cols = row.split(",");
-      if(cols.length >= 8){
-        allProjects.push({
-          category: cols[0].trim(),
-          title: cols[1].trim(),
-          description: cols[2].trim(),
-          images: cols[3].trim(),
-          video: cols[4].trim(),
-          link: cols[5].trim(),
-          year: cols[6].trim(),
-          featured: cols[7].trim()
-        });
-      }
-    });
-    displayProjects(allProjects);
-  });
+        fetch(sheetURL)
+            .then(res => res.text())
+            .then(data => {
+                const rows = data.split("\n").slice(1);
+                rows.forEach(row => {
+                    const cols = row.split(",");
+                    if (cols.length >= 8) {
+                        allProjects.push({
+                            category: cols[0].trim(),
+                            title: cols[1].trim(),
+                            description: cols[2].trim(),
+                            images: cols[3].trim(),
+                            video: cols[4].trim(),
+                            link: cols[5].trim(),
+                            year: cols[6].trim(),
+                            featured: cols[7].trim()
+                        });
+                    }
+                });
+                displayProjects(allProjects);
+            });
 
-function displayProjects(projects){
-  const container = document.getElementById("projects");
-  container.innerHTML = "";
+        function getYouTubeThumbnail(url) {
+            const id = url.split("v=")[1];
+            return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+        }
 
-  projects.forEach(project => {
+        function displayProjects(projects) {
+            const container = document.getElementById("projects");
+            container.innerHTML = "";
 
-    let firstImage = project.images ? project.images.split("|")[0] : "https://via.placeholder.com/800x500";
+            projects.forEach(project => {
 
-    const card = document.createElement("div");
-    card.className = "card";
-    card.innerHTML = `
-      <img src="${firstImage}">
-      <div class="card-content">
-        <h3>${project.title}</h3>
-        <p>${project.description}</p>
-      </div>
-    `;
-    card.onclick = () => openModal(project);
-    container.appendChild(card);
-  });
-}
+                let thumb = "https://via.placeholder.com/800x500";
 
-function filterProjects(category){
-  if(category === "all"){
-    displayProjects(allProjects);
-  } else {
-    displayProjects(allProjects.filter(p => p.category === category));
-  }
-}
+                if (project.images) {
+                    thumb = project.images.split("|")[0];
+                } else if (project.video && project.video.includes("youtube")) {
+                    thumb = getYouTubeThumbnail(project.video);
+                }
 
-function openModal(project){
-  const modal = document.getElementById("modal");
-  const content = document.getElementById("modalContent");
-  content.innerHTML = "";
+                const card = document.createElement("div");
+                card.className = "card";
+                card.innerHTML = `
+          <img src="${thumb}">
+          <div class="card-content">
+            <h3>${project.title}</h3>
+            <p>${project.description}</p>
+          </div>
+        `;
+                card.onclick = () => openModal(project);
+                container.appendChild(card);
+            });
+        }
 
-  // VIDEO
-  if(project.video){
-    let embedURL = "";
+        function filterProjects(category) {
+            if (category === "all") {
+                displayProjects(allProjects);
+            } else {
+                displayProjects(allProjects.filter(p => p.category === category));
+            }
+        }
 
-    if(project.video.includes("youtube")){
-      const videoID = project.video.split("v=")[1];
-      embedURL = `https://www.youtube.com/embed/${videoID}`;
-    }
+        function openModal(project) {
+            const modal = document.getElementById("modal");
+            const content = document.getElementById("modalContent");
+            content.innerHTML = "";
 
-    if(project.video.includes("vimeo")){
-      const videoID = project.video.split("vimeo.com/")[1];
-      embedURL = `https://player.vimeo.com/video/${videoID}`;
-    }
+            // VIDEO
+            if (project.video) {
+                let embedURL = "";
 
-    if(embedURL){
-      content.innerHTML += `<iframe src="${embedURL}" frameborder="0" allowfullscreen></iframe>`;
-    }
-  }
+                if (project.video.includes("youtube")) {
+                    const id = project.video.split("v=")[1];
+                    embedURL = `https://www.youtube.com/embed/${id}`;
+                }
 
-  // IMAGES
-  if(project.images){
-    const imagesArray = project.images.split("|");
-    imagesArray.forEach(img => {
-      content.innerHTML += `<img src="${img}">`;
-    });
-  }
+                if (project.video.includes("vimeo")) {
+                    const id = project.video.split("vimeo.com/")[1];
+                    embedURL = `https://player.vimeo.com/video/${id}`;
+                }
 
-  content.innerHTML += `<h2>${project.title}</h2><p>${project.description}</p>`;
+                if (embedURL) {
+                    content.innerHTML += `<iframe src="${embedURL}" frameborder="0" allowfullscreen></iframe>`;
+                }
+            }
 
-  modal.classList.add("active");
-}
+            // IMAGE SLIDER
+            if (project.images) {
+                currentImages = project.images.split("|");
+                currentSlide = 0;
 
-function closeModal(){
-  document.getElementById("modal").classList.remove("active");
-}
+                content.innerHTML += `
+          <div class="slider">
+            <span class="arrow left" onclick="prevSlide()">‹</span>
+            <img id="slideImage" src="${currentImages[0]}">
+            <span class="arrow right" onclick="nextSlide()">›</span>
+          </div>
+        `;
+            }
+
+            content.innerHTML += `<h2>${project.title}</h2><p>${project.description}</p>`;
+
+            modal.classList.add("active");
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % currentImages.length;
+            document.getElementById("slideImage").src = currentImages[currentSlide];
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + currentImages.length) % currentImages.length;
+            document.getElementById("slideImage").src = currentImages[currentSlide];
+        }
+
+        function closeModal() {
+            document.getElementById("modal").classList.remove("active");
+        }
 
     </script>
 
