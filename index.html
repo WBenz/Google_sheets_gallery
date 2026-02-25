@@ -7,72 +7,45 @@
 
     <style>
         :root {
-            --bg: #070707;
+            --bg: #050505;
             --card: #111;
-            --accent: #ffffff;
             --muted: #888;
         }
 
         * {
-            box-sizing: border-box
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
         }
 
         body {
-            margin: 0;
             font-family: Arial, Helvetica, sans-serif;
             background: var(--bg);
             color: white;
             overflow-x: hidden;
         }
 
-        .loader {
+        /* ===== Animated Background ===== */
+        canvas {
             position: fixed;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--bg);
-            z-index: 9999;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
         }
 
-            .loader span {
-                width: 40px;
-                height: 40px;
-                border: 3px solid #333;
-                border-top: 3px solid white;
-                border-radius: 50%;
-                animation: spin 1s linear infinite;
-            }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg)
-            }
-        }
-
-        /* HERO */
+        /* ===== HERO ===== */
         .hero {
             height: 80vh;
-            position: relative;
             display: flex;
             align-items: center;
             padding: 80px;
-            background-size: cover;
-            background-position: center;
+            position: relative;
         }
 
-            .hero::after {
-                content: "";
-                position: absolute;
-                inset: 0;
-                background: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3));
-            }
-
         .hero-content {
-            position: relative;
-            z-index: 2;
             max-width: 600px;
-            animation: fadeUp 1s ease forwards;
         }
 
         .hero h1 {
@@ -82,14 +55,14 @@
 
         .hero p {
             color: var(--muted);
-            line-height: 1.6;
             margin-bottom: 30px;
+            line-height: 1.6;
         }
 
         .hero button {
             padding: 12px 30px;
-            background: white;
             border: none;
+            background: white;
             cursor: pointer;
             font-weight: bold;
             transition: 0.3s;
@@ -99,40 +72,40 @@
                 background: #ddd;
             }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px)
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0)
-            }
+        /* ===== FILTERS ===== */
+        .filters-wrapper {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            padding: 40px 0 10px;
         }
 
-        /* FILTERS */
         .filters {
-            text-align: center;
-            padding: 40px 0 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 25px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 50px;
+            backdrop-filter: blur(10px);
         }
 
             .filters button {
-                margin: 8px;
-                padding: 10px 25px;
+                padding: 8px 20px;
                 background: transparent;
-                border: 1px solid #222;
+                border: none;
                 color: white;
                 cursor: pointer;
                 transition: 0.3s;
             }
 
                 .filters button:hover {
-                    background: white;
-                    color: black;
+                    opacity: 0.6;
                 }
 
-        /* GRID */
+        /* ===== GRID ===== */
         .grid {
             display: grid;
             grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
@@ -148,7 +121,7 @@
             transition: 0.4s;
             position: relative;
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(40px);
         }
 
             .card.visible {
@@ -188,21 +161,20 @@
         }
 
             .card-content h3 {
-                margin: 0 0 10px;
+                margin-bottom: 10px;
             }
 
             .card-content p {
-                margin: 0;
-                color: var(--muted);
                 font-size: 14px;
+                color: var(--muted);
             }
 
-        /* MODAL */
+        /* ===== MODAL ===== */
         .modal {
             position: fixed;
             inset: 0;
             background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -220,7 +192,6 @@
         .modal-content {
             max-width: 1000px;
             width: 100%;
-            animation: fadeUp 0.4s ease;
         }
 
         iframe {
@@ -237,7 +208,6 @@
                 width: 100%;
                 max-height: 550px;
                 object-fit: contain;
-                transition: 0.4s;
             }
 
         .arrow {
@@ -266,11 +236,9 @@
             cursor: pointer;
         }
 
-        /* RESPONSIVE */
         @media(max-width:768px) {
             .hero {
-                padding: 40px;
-                height: 70vh
+                padding: 40px
             }
 
                 .hero h1 {
@@ -286,17 +254,19 @@
 
 <body>
 
-    <div class="loader" id="loader"><span></span></div>
+    <canvas id="bg"></canvas>
 
-    <section class="hero" id="hero" style="display:none;">
+    <section class="hero">
         <div class="hero-content">
-            <h1 id="heroTitle"></h1>
-            <p id="heroDesc"></p>
+            <h1>Cutting Edge Digital Experiences</h1>
+            <p>We craft modern branding, web and motion systems that move culture forward.</p>
             <button onclick="scrollToProjects()">Explore Projects</button>
         </div>
     </section>
 
-    <div class="filters" id="filters"></div>
+    <div class="filters-wrapper">
+        <div class="filters" id="filters"></div>
+    </div>
 
     <div class="grid" id="projects"></div>
 
@@ -306,9 +276,41 @@
     </div>
 
     <script>
+/* ===== WebGL-style Animated Background ===== */
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
+let particles=[];
+for(let i=0;i<80;i++){
+  particles.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    dx:(Math.random()-0.5)*0.5,
+    dy:(Math.random()-0.5)*0.5,
+    size:Math.random()*2
+  });
+}
+
+function animate(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="rgba(255,255,255,0.5)";
+  particles.forEach(p=>{
+    p.x+=p.dx;
+    p.y+=p.dy;
+    if(p.x<0||p.x>canvas.width)p.dx*=-1;
+    if(p.y<0||p.y>canvas.height)p.dy*=-1;
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
+    ctx.fill();
+  });
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ===== Google Sheet CMS ===== */
         const sheetURL ="https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
-
 let allProjects=[];
 let currentImages=[];
 let currentSlide=0;
@@ -326,50 +328,18 @@ fetch(sheetURL)
         description:cols[2].trim(),
         images:cols[3].trim(),
         video:cols[4].trim(),
-        year:cols[6].trim(),
-        featured:cols[7].trim()
+        year:cols[6].trim()
       });
     }
   });
-  init();
-});
-
-function init(){
-  document.getElementById("loader").style.display="none";
-  setupHero();
   setupFilters();
   displayProjects(allProjects);
-  revealOnScroll();
-}
-
-function setupHero(){
-  let featured=allProjects.find(p=>p.featured==="yes");
-  if(!featured) featured=allProjects[0];
-  if(!featured) return;
-
-  let bg="";
-  if(featured.video && featured.video.includes("youtube")){
-    const id=featured.video.split("v=")[1];
-    bg=`https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-  } else if(featured.images){
-    bg=featured.images.split("|")[0];
-  }
-
-  const hero=document.getElementById("hero");
-  hero.style.backgroundImage=`url(${bg})`;
-  hero.style.display="flex";
-  document.getElementById("heroTitle").innerText=featured.title;
-  document.getElementById("heroDesc").innerText=featured.description;
-}
+});
 
 function setupFilters(){
   const counts={web:0,graphic:0,motion:0};
-  allProjects.forEach(p=>{
-    if(counts[p.category]!==undefined) counts[p.category]++;
-  });
-
-  const filters=document.getElementById("filters");
-  filters.innerHTML=`
+  allProjects.forEach(p=>counts[p.category]++);
+  document.getElementById("filters").innerHTML=`
     <button onclick="filterProjects('all')">All (${allProjects.length})</button>
     <button onclick="filterProjects('web')">Web (${counts.web})</button>
     <button onclick="filterProjects('graphic')">Graphic (${counts.graphic})</button>
@@ -377,7 +347,7 @@ function setupFilters(){
   `;
 }
 
-function getYouTubeThumb(url){
+function getYT(url){
   const id=url.split("v=")[1];
   return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
 }
@@ -388,11 +358,10 @@ function displayProjects(projects){
   projects.forEach(p=>{
     let thumb="";
     if(p.video){
-      thumb=p.video.includes("youtube")?getYouTubeThumb(p.video):"https://via.placeholder.com/800x500?text=Video";
+      thumb=p.video.includes("youtube")?getYT(p.video):"https://via.placeholder.com/800x500?text=Video";
     } else if(p.images){
       thumb=p.images.split("|")[0];
     }
-
     const card=document.createElement("div");
     card.className="card";
     card.innerHTML=`
@@ -406,12 +375,12 @@ function displayProjects(projects){
     card.onclick=()=>openModal(p);
     container.appendChild(card);
   });
+  reveal();
 }
 
 function filterProjects(cat){
   if(cat==="all") displayProjects(allProjects);
   else displayProjects(allProjects.filter(p=>p.category===cat));
-  revealOnScroll();
 }
 
 function openModal(p){
@@ -426,16 +395,11 @@ function openModal(p){
       const id=p.video.split("v=")[1];
       embed=`https://www.youtube.com/embed/${id}`;
     }
-    if(p.video.includes("vimeo")){
-      const id=p.video.split("vimeo.com/")[1];
-      embed=`https://player.vimeo.com/video/${id}`;
-    }
     content.innerHTML+=`<iframe src="${embed}" frameborder="0" allowfullscreen></iframe>`;
   }
 
   if(!p.video && p.images){
     currentImages=p.images.split("|");
-    currentSlide=0;
     content.innerHTML+=`
       <div class="slider">
         <span class="arrow left" onclick="prevSlide()">‹</span>
@@ -464,27 +428,15 @@ function prevSlide(){
   document.getElementById("slideImage").src=currentImages[currentSlide];
 }
 
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape") closeModal();
-  if(e.key==="ArrowRight") nextSlide();
-  if(e.key==="ArrowLeft") prevSlide();
-});
-
-function revealOnScroll(){
-  const cards=document.querySelectorAll(".card");
-  const trigger=window.innerHeight*0.9;
-  cards.forEach(card=>{
-    const top=card.getBoundingClientRect().top;
-    if(top<trigger) card.classList.add("visible");
+function reveal(){
+  document.querySelectorAll(".card").forEach(card=>{
+    setTimeout(()=>card.classList.add("visible"),200);
   });
 }
-
-window.addEventListener("scroll",revealOnScroll);
 
 function scrollToProjects(){
   document.getElementById("projects").scrollIntoView({behavior:"smooth"});
 }
-
     </script>
 
 </body>
