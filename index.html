@@ -1,252 +1,325 @@
-<!DOCTYPE html>
-<html>
+﻿<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tunetek Studio – Projects</title>
+    <title>Tunetek Studio — Design • Motion • Web</title>
 
+    <!-- ============================= -->
+    <!-- GLOBAL STYLES & VARIABLES -->
+    <!-- ============================= -->
     <style>
         :root {
-            --bg: #050505;
-            --card: #111;
-            --muted: #888;
+            --bg: #0b0b0f;
+            --bg-soft: #111118;
+            --accent: #6c5cff;
+            --accent-glow: rgba(108,92,255,0.6);
+            --text: #ffffff;
+            --text-muted: #a0a0b3;
+            --border: rgba(255,255,255,0.08);
+            --radius: 18px;
+            --transition: 0.4s cubic-bezier(.2,.8,.2,1);
         }
 
         * {
-            box-sizing: border-box;
             margin: 0;
-            padding: 0
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
-            font-family: Arial, Helvetica, sans-serif;
+            font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Ubuntu;
             background: var(--bg);
-            color: white;
+            color: var(--text);
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
 
-        /* ===== Animated Background ===== */
-        canvas {
+            /* ============================= */
+            /* BACKGROUND EFFECT */
+            /* ============================= */
+
+            body::before {
+                content: "";
+                position: fixed;
+                top: -20%;
+                left: -20%;
+                width: 140%;
+                height: 140%;
+                background: radial-gradient(circle at 30% 30%, rgba(108,92,255,0.08), transparent 60%), radial-gradient(circle at 70% 70%, rgba(108,92,255,0.06), transparent 60%);
+                animation: floatBg 20s ease-in-out infinite alternate;
+                z-index: -1;
+            }
+
+        @keyframes floatBg {
+            from {
+                transform: translate(0,0);
+            }
+
+            to {
+                transform: translate(-50px,-50px);
+            }
+        }
+
+        /* ============================= */
+        /* NAVIGATION */
+        /* ============================= */
+
+        nav {
             position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            z-index: -1;
-        }
-
-        /* ===== HERO ===== */
-        .hero {
-            height: 80vh;
+            padding: 20px 8%;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            padding: 80px;
-            position: relative;
+            background: rgba(11,11,15,0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
         }
 
-        .hero-content {
-            max-width: 600px;
-        }
-
-        .hero h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
-        }
-
-        .hero p {
-            color: var(--muted);
-            margin-bottom: 30px;
-            line-height: 1.6;
-        }
-
-        .hero button {
-            padding: 12px 30px;
-            border: none;
-            background: white;
-            cursor: pointer;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-            .hero button:hover {
-                background: #ddd;
+            nav h1 {
+                font-size: 20px;
+                letter-spacing: 2px;
             }
 
-        /* ===== FILTERS ===== */
-        .filters-wrapper {
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            padding: 40px 0 10px;
-        }
-
-        .filters {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 25px;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 50px;
-            backdrop-filter: blur(10px);
-        }
-
-            .filters button {
-                padding: 8px 20px;
-                background: transparent;
-                border: none;
-                color: white;
-                cursor: pointer;
-                transition: 0.3s;
+            nav a {
+                color: var(--text-muted);
+                margin-left: 25px;
+                text-decoration: none;
+                transition: var(--transition);
             }
 
-                .filters button:hover {
-                    opacity: 0.6;
+                nav a:hover {
+                    color: var(--text);
                 }
 
-        /* ===== GRID ===== */
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill,minmax(280px,1fr));
-            gap: 30px;
-            padding: 40px;
+        /* ============================= */
+        /* HERO */
+        /* ============================= */
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 10%;
         }
 
-        .card {
-            background: var(--card);
-            border-radius: 14px;
-            overflow: hidden;
+            .hero h2 {
+                font-size: 64px;
+                font-weight: 700;
+                line-height: 1.1;
+            }
+
+            .hero span {
+                color: var(--accent);
+            }
+
+            .hero p {
+                margin-top: 20px;
+                color: var(--text-muted);
+                max-width: 600px;
+            }
+
+        .button {
+            margin-top: 40px;
+            padding: 14px 30px;
+            border-radius: 50px;
+            background: var(--accent);
+            border: none;
+            color: white;
             cursor: pointer;
-            transition: 0.4s;
-            position: relative;
-            opacity: 0;
-            transform: translateY(40px);
+            transition: var(--transition);
         }
 
-            .card.visible {
-                opacity: 1;
-                transform: translateY(0);
+            .button:hover {
+                box-shadow: 0 0 30px var(--accent-glow);
+                transform: translateY(-3px);
             }
 
-            .card img {
-                width: 100%;
-                height: 230px;
-                object-fit: cover;
-                transition: 0.4s;
+        /* ============================= */
+        /* SECTIONS */
+        /* ============================= */
+
+        section {
+            padding: 120px 8%;
+        }
+
+        .section-title {
+            font-size: 38px;
+            margin-bottom: 60px;
+            text-align: center;
+        }
+
+        /* ============================= */
+        /* SERVICES */
+        /* ============================= */
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+            gap: 40px;
+        }
+
+        .service-card {
+            background: var(--bg-soft);
+            padding: 40px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+            .service-card:hover {
+                transform: translateY(-8px);
+                box-shadow: 0 0 40px rgba(108,92,255,0.15);
             }
 
-            .card:hover img {
-                transform: scale(1.08);
-                opacity: 0.7;
+            .service-card h3 {
+                margin-bottom: 15px;
             }
 
-        .overlay {
-            position: absolute;
-            inset: 0;
+        /* ============================= */
+        /* PROJECT CATEGORY CARDS */
+        /* ============================= */
+
+        .project-categories {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            flex-wrap: wrap;
+        }
+
+        .category-card {
+            width: 300px;
+            height: 200px;
+            border-radius: var(--radius);
+            background: var(--bg-soft);
+            border: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 50px;
-            opacity: 0;
-            transition: 0.3s;
+            font-size: 22px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
         }
 
-        .card:hover .overlay {
-            opacity: 1;
-        }
-
-        .card-content {
-            padding: 20px;
-        }
-
-            .card-content h3 {
-                margin-bottom: 10px;
+            .category-card::after {
+                content: "";
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(120deg,transparent,rgba(108,92,255,0.15),transparent);
+                opacity: 0;
+                transition: var(--transition);
             }
 
-            .card-content p {
-                font-size: 14px;
-                color: var(--muted);
+            .category-card:hover {
+                transform: translateY(-6px);
             }
 
-        /* ===== MODAL ===== */
+                .category-card:hover::after {
+                    opacity: 1;
+                }
+
+        /* ============================= */
+        /* MODAL */
+        /* ============================= */
+
         .modal {
             position: fixed;
             inset: 0;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(15px);
-            display: flex;
+            background: rgba(0,0,0,0.6);
+            backdrop-filter: blur(10px);
+            display: none;
             justify-content: center;
             align-items: center;
-            opacity: 0;
-            pointer-events: none;
-            transition: 0.4s;
             padding: 40px;
+            z-index: 2000;
         }
-
-            .modal.active {
-                opacity: 1;
-                pointer-events: auto;
-            }
 
         .modal-content {
+            background: var(--bg-soft);
+            width: 100%;
             max-width: 1000px;
-            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: var(--radius);
+            padding: 40px;
+            animation: modalIn .4s ease;
         }
 
-        iframe {
-            width: 100%;
-            height: 520px;
-            margin-bottom: 20px;
+        @keyframes modalIn {
+            from {
+                opacity: 0;
+                transform: scale(.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
         }
 
-        .slider {
-            position: relative;
+        .close-btn {
+            text-align: right;
+            cursor: pointer;
+            font-size: 18px;
+            color: var(--text-muted);
         }
 
-            .slider img {
+        /* ============================= */
+        /* PROJECT GRID */
+        /* ============================= */
+
+        .project-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(250px,1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .project-card {
+            background: var(--bg);
+            padding: 20px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            transition: var(--transition);
+        }
+
+            .project-card:hover {
+                transform: translateY(-6px);
+                box-shadow: 0 0 25px rgba(108,92,255,0.15);
+            }
+
+            .project-card img {
                 width: 100%;
-                max-height: 550px;
-                object-fit: contain;
+                border-radius: 12px;
+                margin-bottom: 15px;
             }
 
-        .arrow {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 35px;
-            background: rgba(0,0,0,0.6);
-            padding: 10px 15px;
-            cursor: pointer;
-        }
+        /* ============================= */
+        /* FOOTER */
+        /* ============================= */
 
-            .arrow.left {
-                left: 10px
-            }
-
-            .arrow.right {
-                right: 10px
-            }
-
-        .close {
-            position: absolute;
-            top: 30px;
-            right: 50px;
-            font-size: 35px;
-            cursor: pointer;
+        footer {
+            padding: 60px 8%;
+            text-align: center;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border);
+            margin-top: 100px;
         }
 
         @media(max-width:768px) {
-            .hero {
-                padding: 40px
+            .hero h2 {
+                font-size: 40px;
             }
 
-                .hero h1 {
-                    font-size: 32px
-                }
-
-            iframe {
-                height: 300px
+            nav {
+                padding: 20px;
             }
         }
     </style>
@@ -254,188 +327,115 @@
 
 <body>
 
-    <canvas id="bg"></canvas>
+    <nav>
+        <h1>TUNETEK</h1>
+        <div>
+            <a href="#services">Services</a>
+            <a href="#projects">Projects</a>
+            <a href="#contact">Contact</a>
+        </div>
+    </nav>
 
-    <section class="hero">
-        <div class="hero-content">
-            <h1>Cutting Edge Digital Experiences</h1>
-            <p>We craft modern branding, web and motion systems that move culture forward.</p>
-            <button onclick="scrollToProjects()">Explore Projects</button>
+    <!-- ================= HERO ================= -->
+
+    <div class="hero">
+        <h2>We Build <span>Brands</span><br>Through Design & Motion</h2>
+        <p>Creative studio crafting modern digital identities, cinematic motion design and cutting-edge web experiences.</p>
+        <button class="button" onclick="scrollToProjects()">Explore Work</button>
+    </div>
+
+    <!-- ================= SERVICES ================= -->
+
+    <section id="services">
+        <h2 class="section-title">Services</h2>
+        <div class="services-grid">
+            <div class="service-card">
+                <h3>Brand & Graphic Design</h3>
+                <p>Visual identity systems, branding strategy, digital and print design.</p>
+            </div>
+            <div class="service-card">
+                <h3>Motion Design</h3>
+                <p>Cinematic animations, reels, social content, and promotional videos.</p>
+            </div>
+            <div class="service-card">
+                <h3>Web Design</h3>
+                <p>High-end modern websites with interactive and performance-first architecture.</p>
+            </div>
         </div>
     </section>
 
-    <div class="filters-wrapper">
-        <div class="filters" id="filters"></div>
+    <!-- ================= PROJECTS ================= -->
+
+    <section id="projects">
+        <h2 class="section-title">Projects</h2>
+        <div class="project-categories">
+            <div class="category-card" onclick="openCategory('graphic')">Graphic Design</div>
+            <div class="category-card" onclick="openCategory('motion')">Motion Design</div>
+            <div class="category-card" onclick="openCategory('web')">Web Design</div>
+        </div>
+    </section>
+
+    <!-- ================= MODAL ================= -->
+
+    <div class="modal" id="projectModal">
+        <div class="modal-content">
+            <div class="close-btn" onclick="closeModal()">Close ✕</div>
+            <h2 id="modalTitle"></h2>
+            <div class="project-grid" id="projectGrid"></div>
+        </div>
     </div>
 
-    <div class="grid" id="projects"></div>
+    <footer id="contact">
+        © 2026 Tunetek Studio — All Rights Reserved
+    </footer>
 
-    <div class="modal" id="modal">
-        <div class="close" onclick="closeModal()">✖</div>
-        <div class="modal-content" id="modalContent"></div>
-    </div>
+    <!-- ============================= -->
+    <!-- GOOGLE SHEETS CMS ENGINE -->
+    <!-- ============================= -->
 
     <script>
-/* ===== WebGL-style Animated Background ===== */
-const canvas=document.getElementById("bg");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let particles=[];
-for(let i=0;i<80;i++){
-  particles.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    dx:(Math.random()-0.5)*0.5,
-    dy:(Math.random()-0.5)*0.5,
-    size:Math.random()*2
-  });
-}
-
-function animate(){
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle="rgba(255,255,255,0.5)";
-  particles.forEach(p=>{
-    p.x+=p.dx;
-    p.y+=p.dy;
-    if(p.x<0||p.x>canvas.width)p.dx*=-1;
-    if(p.y<0||p.y>canvas.height)p.dy*=-1;
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.size,0,Math.PI*2);
-    ctx.fill();
-  });
-  requestAnimationFrame(animate);
-}
-animate();
-
-/* ===== Google Sheet CMS ===== */
-        const sheetURL ="https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
-let allProjects=[];
-let currentImages=[];
-let currentSlide=0;
-
-fetch(sheetURL)
-.then(res=>res.text())
-.then(data=>{
-  const rows=data.split("\n").slice(1);
-  rows.forEach(row=>{
-    const cols=row.split(",");
-    if(cols.length>=8){
-      allProjects.push({
-        category:cols[0].trim(),
-        title:cols[1].trim(),
-        description:cols[2].trim(),
-        images:cols[3].trim(),
-        video:cols[4].trim(),
-        year:cols[6].trim()
-      });
-    }
-  });
-  setupFilters();
-  displayProjects(allProjects);
-});
-
-function setupFilters(){
-  const counts={web:0,graphic:0,motion:0};
-  allProjects.forEach(p=>counts[p.category]++);
-  document.getElementById("filters").innerHTML=`
-    <button onclick="filterProjects('all')">All (${allProjects.length})</button>
-    <button onclick="filterProjects('web')">Web (${counts.web})</button>
-    <button onclick="filterProjects('graphic')">Graphic (${counts.graphic})</button>
-    <button onclick="filterProjects('motion')">Motion (${counts.motion})</button>
-  `;
-}
-
-function getYT(url){
-  const id=url.split("v=")[1];
-  return `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
-}
-
-function displayProjects(projects){
-  const container=document.getElementById("projects");
-  container.innerHTML="";
-  projects.forEach(p=>{
-    let thumb="";
-    if(p.video){
-      thumb=p.video.includes("youtube")?getYT(p.video):"https://via.placeholder.com/800x500?text=Video";
-    } else if(p.images){
-      thumb=p.images.split("|")[0];
-    }
-    const card=document.createElement("div");
-    card.className="card";
-    card.innerHTML=`
-      <img loading="lazy" src="${thumb}">
-      ${p.video?'<div class="overlay">▶</div>':''}
-      <div class="card-content">
-        <h3>${p.title}</h3>
-        <p>${p.year}</p>
-      </div>
-    `;
-    card.onclick=()=>openModal(p);
-    container.appendChild(card);
-  });
-  reveal();
-}
-
-function filterProjects(cat){
-  if(cat==="all") displayProjects(allProjects);
-  else displayProjects(allProjects.filter(p=>p.category===cat));
-}
-
-function openModal(p){
-  const modal=document.getElementById("modal");
-  const content=document.getElementById("modalContent");
-  content.innerHTML="";
-  document.body.style.overflow="hidden";
-
-  if(p.video){
-    let embed="";
-    if(p.video.includes("youtube")){
-      const id=p.video.split("v=")[1];
-      embed=`https://www.youtube.com/embed/${id}`;
-    }
-    content.innerHTML+=`<iframe src="${embed}" frameborder="0" allowfullscreen></iframe>`;
-  }
-
-  if(!p.video && p.images){
-    currentImages=p.images.split("|");
-    content.innerHTML+=`
-      <div class="slider">
-        <span class="arrow left" onclick="prevSlide()">‹</span>
-        <img id="slideImage" src="${currentImages[0]}">
-        <span class="arrow right" onclick="nextSlide()">›</span>
-      </div>
-    `;
-  }
-
-  content.innerHTML+=`<h2>${p.title}</h2><p>${p.description}</p>`;
-  modal.classList.add("active");
-}
-
-function closeModal(){
-  document.getElementById("modal").classList.remove("active");
-  document.body.style.overflow="auto";
-}
-
-function nextSlide(){
-  currentSlide=(currentSlide+1)%currentImages.length;
-  document.getElementById("slideImage").src=currentImages[currentSlide];
-}
-
-function prevSlide(){
-  currentSlide=(currentSlide-1+currentImages.length)%currentImages.length;
-  document.getElementById("slideImage").src=currentImages[currentSlide];
-}
-
-function reveal(){
-  document.querySelectorAll(".card").forEach(card=>{
-    setTimeout(()=>card.classList.add("visible"),200);
-  });
-}
+        const SHEET_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSzgDa6M2D5mjfi8e4OvbfWjRoegScwR0z66AmPZKhAf19u8QSIwUM_LKXOrWk__3rs8vtsS4Q7GQ39/pub?output=csv";
 
 function scrollToProjects(){
   document.getElementById("projects").scrollIntoView({behavior:"smooth"});
+}
+
+function openCategory(category){
+  document.getElementById("projectModal").style.display="flex";
+  document.getElementById("modalTitle").innerText = category.toUpperCase() + " PROJECTS";
+  loadProjects(category);
+}
+
+function closeModal(){
+  document.getElementById("projectModal").style.display="none";
+  document.getElementById("projectGrid").innerHTML="";
+}
+
+async function loadProjects(category){
+  const res = await fetch(SHEET_URL);
+  const data = await res.json();
+  const filtered = data.filter(p => p.category === category);
+  const grid = document.getElementById("projectGrid");
+  grid.innerHTML="";
+  filtered.forEach(p=>{
+    const card = document.createElement("div");
+    card.className="project-card";
+    card.innerHTML = `
+      ${p.video ? `<iframe width="100%" height="200" src="${convertToEmbed(p.video)}" frameborder="0" allowfullscreen></iframe>` :
+      `<img src="${p.images.split('|')[0]}" loading="lazy">`}
+      <h3>${p.title}</h3>
+      <p>${p.description}</p>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function convertToEmbed(url){
+  if(url.includes("youtube")){
+    const id = url.split("v=")[1];
+    return `https://www.youtube.com/embed/${id}`;
+  }
+  return url;
 }
     </script>
 
